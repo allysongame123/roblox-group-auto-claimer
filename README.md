@@ -7,5 +7,6 @@
 4. Set the webhook argument of your group scanner to `http://localhost:8080/webhook`
 
 # Usage
-In order for the bot to be able to join groups, it has to have tokens ready within it's queue system.
+- To visit the dashboard, go to http://localhost:8080/.
+- In order for the bot to be able to join groups, it has to have tokens ready within it's queue system.
 To add a new token to the queue, click `Add Token` and solve the prompted challenge. Each token will only last a couple minutes, so you'll have to repeat this process.
