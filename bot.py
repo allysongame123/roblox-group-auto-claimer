@@ -12,7 +12,7 @@ import json
 import time
 
 group_queue = Queue()
-token_queue = ExpiringQueue(max_size=5, ttl=180)
+token_queue = ExpiringQueue(max_size=5, ttl=120)
 logs = deque(maxlen=100)
 
 # load cookie from file
