@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container">
+            <div id="stats">
+                <span>Token queue: <span id="token-queue-length">?</span></span>
+                <br/>
+                <span>Expiring in: <span id="token-queue-expiry">?</span></span>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openCaptchaWindow()">Add Token</button>
+
+            <br/>
+            <br/>
+            <div id="logs">
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Time</th>
+                        <th scope="col">Group ID</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Success</th>
+                        <th scope="col">Response</th>
+                      </tr>
+                    </thead>
+                    <tbody id="logs-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            async function openCaptchaWindow() {
+                let url = "/captcha"
+                window.open(url, "_blank", "height=252, width=308")
+            }
+
+            async function updateStats() {
+                let resp = await fetch("/api/stats")
+                let data = await resp.json()
+                $("#token-queue-length").text(data.tokenQueueLength)
+                $("#token-queue-expiry").text(data.tokenQueueExpiringIn ? data.tokenQueueExpiringIn.toFixed(2) + "s" : "")
+            }
+
+            function formatEpoch(ts) {
+                let date = new Date(ts * 1000)
+                return date.toLocaleTimeString()
+            }
+
+            async function updateLogs() {
+                let resp = await fetch("/api/logs")
+                let logs = await resp.json()
+                
+                let scrollCache = document.body.scrollTop
+                let record
+                $("#logs-body").empty()
+                for (var idx = 0; idx < logs.length; idx++) {
+                    record = logs[idx]
+                    $("#logs-body").append(`
+                        <tr>
+                            <th scope="row">${formatEpoch(record.time)}</th>
+                            <td>${record.params.groupId}</td>
+                            <td>${record.action}</td>
+                            <td>${record.params.success}</td>
+                            <td>${record.params.response}</td>
+                        </tr>
+                    `)
+                }
+                document.body.scrollTop = scrollCache
+            }
+            
+            setInterval(updateLogs, 2000)
+            setInterval(updateStats, 2000)
+        </script>
+    </body>
+</html>

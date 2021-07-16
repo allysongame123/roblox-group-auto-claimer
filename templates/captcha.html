@@ -1,0 +1,30 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <center>
+            <div id="CAPTCHA"></div>
+        </center>
+        
+        <script src="{{ service_url }}/fc/api/?onload=onArkoseLoaded"></script>
+        <script>
+            async function onArkoseLoaded() {
+                const captcha = new ArkoseEnforcement({
+                    public_key: {{ public_key | tojson | safe }},
+                    data: {{ data | tojson | safe }},
+                    target_html: "CAPTCHA",
+                    callback: async () => {
+                        const token = captcha.getSessionToken()
+                        await fetch("/api/token-queue", {
+                            method: "POST",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({token: token})
+                        })
+                        window.close()
+                    }
+                })
+            }
+        </script>
+    </body>
+</html>
