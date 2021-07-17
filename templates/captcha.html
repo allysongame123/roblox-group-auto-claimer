@@ -19,7 +19,10 @@
                         await fetch("/api/token-queue", {
                             method: "POST",
                             headers: {"Content-Type": "application/json"},
-                            body: JSON.stringify({token: token})
+                            body: JSON.stringify({
+                                token: token,
+                                captchaId: {{ captcha_id | tojson | safe }}
+                            })
                         })
                         window.close()
                     }

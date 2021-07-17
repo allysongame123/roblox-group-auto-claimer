@@ -49,7 +49,7 @@ def group_claimer(group_queue, token_queue, logs, cookie, user_id):
     while True:
         group_id = group_queue.get(True)
         try:
-            token = token_queue.get(True, 15)
+            token, captcha_id = token_queue.get(True, 15)
         except TimeoutError:
             print(f"Skipped group {group_id} because token queue timed out")
             continue
@@ -61,11 +61,11 @@ def group_claimer(group_queue, token_queue, logs, cookie, user_id):
                 f"POST /v1/groups/{group_id}/users HTTP/1.1\n"
                 "Host:groups.roblox.com\n"
                 "Content-Type:application/json\n"
-                f"Content-Length:{77+len(token)}\n"
+                f"Content-Length:{75+len(captcha_id)+len(token)}\n"
                 f"X-CSRF-TOKEN:{shared.csrf_token}\n"
                 f"Cookie:.ROBLOSECURITY={cookie}\n"
                 "\n"
-                f'{{"captchaId":"\\n","captchaToken":"{token}","captchaProvider":"PROVIDER_ARKOSE_LABS"}}'.encode())
+                f'{{"captchaId":"{captcha_id}","captchaToken":"{token}","captchaProvider":"PROVIDER_ARKOSE_LABS"}}'.encode())
             resp = temp_sock.recv(1024 ** 2).split(b"\r\n\r\n", 1)[1].decode()
             success = resp == "{}"
             logs.appendleft({
