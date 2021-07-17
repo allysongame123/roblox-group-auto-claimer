@@ -4,7 +4,7 @@ import logging
 import secrets
 
 def get_blob(cookie):
-    captcha_id = secrets.token_bytes(4)
+    captcha_id = secrets.token_hex(4)
     shared.sock.send(
         f"POST /v1/groups/142336/users HTTP/1.1\n"
         "Host:groups.roblox.com\n"
